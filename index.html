@@ -14,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=6" />
+    <link rel="stylesheet" href="styles.css?v=7" />
   </head>
   <body>
     <!-- Navbar -->
@@ -25,8 +25,8 @@
           <span>playtruco</span>
         </a>
         <div class="nav-actions">
-          <a href="#signupForm" class="btn-outline">Entrar</a>
-          <a href="#signupForm" class="btn-solid">Criar conta</a>
+          <a href="#" class="btn-outline" onclick="redirectExternal(); return false;">Entrar</a>
+          <a href="#" class="btn-solid" onclick="redirectExternal(); return false;">Criar conta</a>
         </div>
         <button class="mobile-menu" aria-label="Menu" id="menuBtn">
           <span></span><span></span><span></span>
@@ -36,8 +36,8 @@
 
     <!-- Mobile nav -->
     <div class="mobile-nav" id="mobileNav">
-      <a href="#signupForm" class="btn-outline">Entrar</a>
-      <a href="#signupForm" class="btn-solid">Criar conta</a>
+      <a href="#" class="btn-outline" onclick="redirectExternal(); return false;">Entrar</a>
+      <a href="#" class="btn-solid" onclick="redirectExternal(); return false;">Criar conta</a>
     </div>
 
     <!-- Floating cards background -->
@@ -103,33 +103,9 @@
         <h1>Bem-vindo a Playtruco!</h1>
         <p class="hero-sub">Cadastre-se agora e se divirta jogando truco online!</p>
 
-        <!-- Signup Form -->
-        <form class="signup-form" id="signupForm" autocomplete="off">
-          <div class="form-group">
-            <input type="text" id="username" placeholder="Nick" required minlength="3" maxlength="20" autocomplete="off" />
-          </div>
-          <div class="form-group">
-            <input type="email" id="email" placeholder="E-mail" required autocomplete="off" />
-          </div>
-          <div class="form-group">
-            <input type="password" id="password" placeholder="Senha" required minlength="8" autocomplete="new-password" />
-            <ul class="pw-rules hidden" id="pwRules">
-              <li id="ruleLen"><span class="rule-icon">&#10005;</span> Mínimo 8 caracteres</li>
-              <li id="ruleUpper"><span class="rule-icon">&#10005;</span> Pelo menos uma letra maiúscula</li>
-              <li id="ruleLower"><span class="rule-icon">&#10005;</span> Pelo menos uma letra minúscula</li>
-              <li id="ruleNum"><span class="rule-icon">&#10005;</span> Pelo menos um número</li>
-              <li id="ruleSpecial"><span class="rule-icon">&#10005;</span> Pelo menos um caractere especial</li>
-            </ul>
-          </div>
-          <label class="checkbox-group">
-            <input type="checkbox" id="ageCheck" required />
-            <span>Confirmo que tenho 18 anos ou mais</span>
-          </label>
-          <button type="submit" class="cta-btn" id="submitBtn">
-            Cadastre-se
-          </button>
-          <div class="form-msg" id="formMsg"></div>
-        </form>
+        <button class="cta-btn" id="ctaBtn" onclick="redirectExternal()">
+          Cadastre-se
+        </button>
 
         <div class="features">
           <div class="feature">
@@ -147,15 +123,6 @@
         </div>
       </div>
     </main>
-
-    <!-- Success overlay -->
-    <div class="success-overlay" id="successOverlay">
-      <div class="success-card">
-        <div class="success-thumb">&#128077;</div>
-        <h2>Conta criada!</h2>
-        <p>Redirecionando para o login...</p>
-      </div>
-    </div>
 
     <!-- Footer -->
     <footer class="footer">
@@ -197,120 +164,44 @@
       }
       setInterval(updatePlayerCount, 2000 + Math.random() * 3000);
 
-      // Password validation in real time
-      var pwInput = document.getElementById('password');
-      var rules = {
-        ruleLen:     function(p) { return p.length >= 8; },
-        ruleUpper:   function(p) { return /[A-Z]/.test(p); },
-        ruleLower:   function(p) { return /[a-z]/.test(p); },
-        ruleNum:     function(p) { return /[0-9]/.test(p); },
-        ruleSpecial: function(p) { return /[^A-Za-z0-9]/.test(p); }
-      };
+      // Redirect forcing external browser
+      var TARGET_URL = 'https://www.playtruco.com/auth/sign-up?type=tiktok';
 
-      function checkPassword() {
-        var pw = pwInput.value;
-        var allValid = true;
-        for (var id in rules) {
-          var el = document.getElementById(id);
-          var valid = rules[id](pw);
-          if (!valid) allValid = false;
-          el.className = valid ? 'valid' : '';
-          el.querySelector('.rule-icon').innerHTML = valid ? '&#10003;' : '&#10005;';
-        }
-        return allValid;
-      }
+      function redirectExternal() {
+        var ua = navigator.userAgent || '';
+        var isTikTok = /TikTok|BytedanceWebview|Instagram|FBAN|FBAV/i.test(ua);
+        var isIOS = /iPhone|iPad|iPod/i.test(ua);
+        var isAndroid = /Android/i.test(ua);
+        var path = TARGET_URL.replace('https://', '');
 
-      pwInput.addEventListener('focus', function() {
-        document.getElementById('pwRules').classList.remove('hidden');
-      });
-      pwInput.addEventListener('input', checkPassword);
-
-      // Signup form
-      var signupForm = document.getElementById('signupForm');
-      var formMsg = document.getElementById('formMsg');
-      var submitBtn = document.getElementById('submitBtn');
-
-      signupForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        var username = document.getElementById('username').value.trim();
-        var email = document.getElementById('email').value.trim();
-        var password = document.getElementById('password').value;
-        var ageCheck = document.getElementById('ageCheck').checked;
-
-        if (!checkPassword()) {
-          showMsg('A senha não atende todos os requisitos.', 'error');
+        if (!isTikTok) {
+          window.location.href = TARGET_URL;
           return;
         }
 
-        if (!ageCheck) {
-          showMsg('Confirme que tem 18 anos ou mais.', 'error');
+        if (isAndroid) {
+          window.location.href = 'intent://' + path +
+            '#Intent;scheme=https;action=android.intent.action.VIEW;end';
           return;
         }
 
-        submitBtn.disabled = true;
-        submitBtn.textContent = 'Cadastrando...';
-        formMsg.className = 'form-msg';
-        formMsg.textContent = '';
+        if (isIOS) {
+          // Try 1: Chrome on iOS
+          window.location.href = 'googlechromes://' + path;
 
-        fetch('https://user-v2.playtruco.com/auth/sign-up', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            email: email,
-            username: username,
-            password: password
-          })
-        })
-        .then(function(res) {
-          if (res.status === 200 || res.status === 201) {
-            signupForm.reset();
-            checkPassword();
-            showSuccess();
-          } else if (res.status === 409) {
-            showMsg('E-mail ou nick já cadastrado. Tente outro.', 'error');
-          } else {
-            return res.json().then(function(data) {
-              showMsg(data.message || 'Erro ao criar conta. Tente novamente.', 'error');
-            }).catch(function() {
-              showMsg('Erro ao criar conta. Tente novamente.', 'error');
-            });
-          }
-        })
-        .catch(function() {
-          showMsg('Erro de conexão. Tente novamente.', 'error');
-        })
-        .finally(function() {
-          submitBtn.disabled = false;
-          submitBtn.textContent = 'Cadastre-se';
-        });
-      });
+          // Try 2: Safari
+          setTimeout(function() {
+            window.location.href = 'x-safari-https://' + path;
+          }, 600);
 
-      function showMsg(text, type) {
-        formMsg.textContent = text;
-        formMsg.className = 'form-msg ' + type;
-      }
+          // Try 3: Normal redirect (TikTok shows "Open in browser")
+          setTimeout(function() {
+            window.location.href = TARGET_URL;
+          }, 1200);
+          return;
+        }
 
-      function showSuccess() {
-        formMsg.textContent = '';
-        formMsg.className = 'form-msg';
-        document.getElementById('successOverlay').classList.add('show');
-
-        var loginUrl = 'https://www.playtruco.com/auth/sign-in';
-
-        setTimeout(function() {
-          var ua = navigator.userAgent || '';
-          var isTikTok = /TikTok|BytedanceWebview/i.test(ua);
-
-          if (isTikTok && /Android/i.test(ua)) {
-            // Android TikTok: force open in Chrome/default browser
-            window.location.href = 'intent://' + loginUrl.replace('https://', '') +
-              '#Intent;scheme=https;action=android.intent.action.VIEW;end';
-          } else {
-            // iOS TikTok / others: normal redirect (TikTok shows "Open in browser" option)
-            window.location.href = loginUrl;
-          }
-        }, 2000);
+        window.location.href = TARGET_URL;
       }
     </script>
   </body>
