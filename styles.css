@@ -290,6 +290,9 @@ a {
   font-size: 1.15rem;
   font-weight: 700;
   border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
   transition: all 0.25s ease;
   letter-spacing: 0.5px;
 }

@@ -14,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=7" />
+    <link rel="stylesheet" href="styles.css?v=8" />
   </head>
   <body>
     <!-- Navbar -->
@@ -25,8 +25,8 @@
           <span>playtruco</span>
         </a>
         <div class="nav-actions">
-          <a href="#" class="btn-outline" onclick="redirectExternal(); return false;">Entrar</a>
-          <a href="#" class="btn-solid" onclick="redirectExternal(); return false;">Criar conta</a>
+          <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" class="btn-outline" onclick="openExternal(event)">Entrar</a>
+          <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" class="btn-solid" onclick="openExternal(event)">Criar conta</a>
         </div>
         <button class="mobile-menu" aria-label="Menu" id="menuBtn">
           <span></span><span></span><span></span>
@@ -36,8 +36,8 @@
 
     <!-- Mobile nav -->
     <div class="mobile-nav" id="mobileNav">
-      <a href="#" class="btn-outline" onclick="redirectExternal(); return false;">Entrar</a>
-      <a href="#" class="btn-solid" onclick="redirectExternal(); return false;">Criar conta</a>
+      <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" class="btn-outline" onclick="openExternal(event)">Entrar</a>
+      <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" class="btn-solid" onclick="openExternal(event)">Criar conta</a>
     </div>
 
     <!-- Floating cards background -->
@@ -103,9 +103,9 @@
         <h1>Bem-vindo a Playtruco!</h1>
         <p class="hero-sub">Cadastre-se agora e se divirta jogando truco online!</p>
 
-        <button class="cta-btn" id="ctaBtn" onclick="redirectExternal()">
+        <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" class="cta-btn" id="ctaBtn" onclick="openExternal(event)">
           Cadastre-se
-        </button>
+        </a>
 
         <div class="features">
           <div class="feature">
@@ -145,43 +145,52 @@
 
     <script>
       // Mobile menu
-      var menuBtn = document.getElementById('menuBtn');
-      var mobileNav = document.getElementById('mobileNav');
-      menuBtn.addEventListener('click', function() {
+      const menuBtn = document.getElementById('menuBtn');
+      const mobileNav = document.getElementById('mobileNav');
+      menuBtn.addEventListener('click', () => {
         mobileNav.classList.toggle('open');
         menuBtn.classList.toggle('active');
       });
 
       // Players online counter
-      var playerCount = document.getElementById('playerCount');
-      var currentCount = 260 + Math.floor(Math.random() * 56);
+      const playerCount = document.getElementById('playerCount');
+      let currentCount = 260 + Math.floor(Math.random() * 56);
       playerCount.textContent = currentCount;
 
       function updatePlayerCount() {
-        var change = Math.floor(Math.random() * 7) - 3;
+        const change = Math.floor(Math.random() * 7) - 3;
         currentCount = Math.max(260, Math.min(315, currentCount + change));
         playerCount.textContent = currentCount;
       }
+
       setInterval(updatePlayerCount, 2000 + Math.random() * 3000);
 
-      // Redirect forcing external browser
+      // Detect TikTok / in-app browsers
+      function isInAppBrowser() {
+        var ua = navigator.userAgent || navigator.vendor || '';
+        return /TikTok|BytedanceWebview|Instagram|FBAN|FBAV|Line\//i.test(ua);
+      }
+
       var TARGET_URL = 'https://www.playtruco.com/auth/sign-up?type=tiktok';
 
-      function redirectExternal() {
-        var ua = navigator.userAgent || '';
-        var isTikTok = /TikTok|BytedanceWebview|Instagram|FBAN|FBAV/i.test(ua);
-        var isIOS = /iPhone|iPad|iPod/i.test(ua);
-        var isAndroid = /Android/i.test(ua);
-        var path = TARGET_URL.replace('https://', '');
+      function openExternal(e) {
+        e.preventDefault();
+        var url = TARGET_URL;
 
-        if (!isTikTok) {
-          window.location.href = TARGET_URL;
+        if (!isInAppBrowser()) {
+          window.open(url, '_blank');
           return;
         }
 
+        var ua = navigator.userAgent || '';
+        var isIOS = /iPhone|iPad|iPod/i.test(ua);
+        var isAndroid = /Android/i.test(ua);
+        var path = url.replace('https://', '');
+
         if (isAndroid) {
-          window.location.href = 'intent://' + path +
+          var intentUrl = 'intent://' + path +
             '#Intent;scheme=https;action=android.intent.action.VIEW;end';
+          window.location.href = intentUrl;
           return;
         }
 
@@ -196,12 +205,12 @@
 
           // Try 3: Normal redirect (TikTok shows "Open in browser")
           setTimeout(function() {
-            window.location.href = TARGET_URL;
+            window.location.href = url;
           }, 1200);
           return;
         }
 
-        window.location.href = TARGET_URL;
+        window.location.href = url;
       }
     </script>
   </body>
