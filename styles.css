@@ -335,6 +335,36 @@ a {
   border-color: var(--accent);
 }
 
+/* Password rules checklist */
+.pw-rules {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;
+  padding: 0;
+}
+
+.pw-rules li {
+  font-size: 0.78rem;
+  color: #f87171;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+}
+
+.pw-rules li.valid {
+  color: #4ade80;
+}
+
+.rule-icon {
+  font-size: 0.7rem;
+  width: 14px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
 .checkbox-group {
   display: flex;
   align-items: center;
