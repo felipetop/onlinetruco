@@ -14,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=9" />
+    <link rel="stylesheet" href="styles.css?v=10" />
   </head>
   <body>
     <!-- Navbar -->
@@ -124,6 +124,21 @@
       </div>
     </main>
 
+    <!-- Redirect overlay (fallback for in-app browsers) -->
+    <div class="redirect-overlay" id="redirectOverlay">
+      <div class="redirect-card">
+        <div class="redirect-icon">
+          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8a45a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+        </div>
+        <h2>Abra no seu navegador</h2>
+        <p>Para continuar, abra este link no Chrome ou Safari:</p>
+        <div class="redirect-url" id="redirectUrl">https://www.playtruco.com</div>
+        <a href="https://www.playtruco.com" id="redirectLink" target="_blank" rel="noopener" class="cta-btn">Abrir no navegador</a>
+        <button class="redirect-copy" onclick="copyLink()">Copiar link</button>
+        <p class="redirect-hint">Ou toque nos 3 pontinhos (&#8943;) acima e selecione "Abrir no navegador"</p>
+      </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
       <div class="footer-inner">
@@ -176,43 +191,28 @@
         var url = e.currentTarget.href;
 
         if (!isInAppBrowser()) {
-          window.open(url, '_blank');
-          e.preventDefault();
-          return;
+          return; // browser normal, deixa seguir o link
         }
 
         e.preventDefault();
 
-        var ua = navigator.userAgent || '';
-        var path = url.replace(/^https?:\/\//, '');
+        // tenta abrir nova aba
+        window.open(url, '_blank');
 
-        // Android: use intent:// to force Chrome
-        if (/Android/i.test(ua)) {
-          var intentUrl = 'intent://' + path +
-            '#Intent;scheme=https;package=com.android.chrome;end';
-          window.location.href = intentUrl;
-          return;
-        }
-
-        // iOS: try multiple methods
-        if (/iPhone|iPad|iPod/i.test(ua)) {
-          // Try 1: Chrome on iOS
-          window.location.href = 'googlechromes://' + path;
-
-          // Try 2: Safari
-          setTimeout(function() {
-            window.location.href = 'x-safari-https://' + path;
-          }, 600);
-
-          // Try 3: Normal redirect (TikTok shows "Open in browser")
-          setTimeout(function() {
-            window.location.href = url;
-          }, 1200);
-          return;
-        }
-
-        // Fallback
-        window.location.href = url;
+        // fallback: mostra tela guiando o usuário
+        setTimeout(function() {
+          document.getElementById('redirectOverlay').classList.add('show');
+          document.getElementById('redirectLink').href = url;
+          document.getElementById('redirectUrl').textContent = url;
+        }, 800);
+      }
+      function copyLink() {
+        var url = document.getElementById('redirectLink').href;
+        navigator.clipboard.writeText(url).then(function() {
+          var btn = document.querySelector('.redirect-copy');
+          btn.textContent = 'Link copiado!';
+          setTimeout(function() { btn.textContent = 'Copiar link'; }, 2000);
+        });
       }
     </script>
   </body>
