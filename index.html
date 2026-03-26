@@ -14,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=2" />
+    <link rel="stylesheet" href="styles.css?v=3" />
   </head>
   <body>
     <!-- Navbar -->
@@ -25,8 +25,8 @@
           <span>playtruco</span>
         </a>
         <div class="nav-actions">
-          <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" class="btn-outline" onclick="openExternal(event)">Entrar</a>
-          <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" class="btn-solid" onclick="openExternal(event)">Criar conta</a>
+          <a href="#signupForm" class="btn-outline">Entrar</a>
+          <a href="#signupForm" class="btn-solid">Criar conta</a>
         </div>
         <button class="mobile-menu" aria-label="Menu" id="menuBtn">
           <span></span><span></span><span></span>
@@ -36,8 +36,8 @@
 
     <!-- Mobile nav -->
     <div class="mobile-nav" id="mobileNav">
-      <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" class="btn-outline" onclick="openExternal(event)">Entrar</a>
-      <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" class="btn-solid" onclick="openExternal(event)">Criar conta</a>
+      <a href="#signupForm" class="btn-outline">Entrar</a>
+      <a href="#signupForm" class="btn-solid">Criar conta</a>
     </div>
 
     <!-- Floating cards background -->
@@ -103,9 +103,26 @@
         <h1>Bem-vindo a Playtruco!</h1>
         <p class="hero-sub">Cadastre-se agora e se divirta jogando truco online!</p>
 
-        <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" class="cta-btn" id="ctaBtn" onclick="openExternal(event)">
-          Cadastre-se
-        </a>
+        <!-- Signup Form -->
+        <form class="signup-form" id="signupForm" autocomplete="off">
+          <div class="form-group">
+            <input type="text" id="username" placeholder="Nick" required minlength="3" maxlength="20" autocomplete="off" />
+          </div>
+          <div class="form-group">
+            <input type="email" id="email" placeholder="E-mail" required autocomplete="off" />
+          </div>
+          <div class="form-group">
+            <input type="password" id="password" placeholder="Senha" required minlength="6" autocomplete="new-password" />
+          </div>
+          <label class="checkbox-group">
+            <input type="checkbox" id="ageCheck" required />
+            <span>Confirmo que tenho 18 anos ou mais</span>
+          </label>
+          <button type="submit" class="cta-btn" id="submitBtn">
+            Cadastre-se
+          </button>
+          <div class="form-msg" id="formMsg"></div>
+        </form>
 
         <div class="features">
           <div class="feature">
@@ -145,87 +162,79 @@
 
     <script>
       // Mobile menu
-      const menuBtn = document.getElementById('menuBtn');
-      const mobileNav = document.getElementById('mobileNav');
-      menuBtn.addEventListener('click', () => {
+      var menuBtn = document.getElementById('menuBtn');
+      var mobileNav = document.getElementById('mobileNav');
+      menuBtn.addEventListener('click', function() {
         mobileNav.classList.toggle('open');
         menuBtn.classList.toggle('active');
       });
 
-      // Players online counter - fluctuates between 260 and 315
-      const playerCount = document.getElementById('playerCount');
-      let currentCount = 260 + Math.floor(Math.random() * 56);
+      // Players online counter
+      var playerCount = document.getElementById('playerCount');
+      var currentCount = 260 + Math.floor(Math.random() * 56);
       playerCount.textContent = currentCount;
 
       function updatePlayerCount() {
-        const change = Math.floor(Math.random() * 7) - 3;
+        var change = Math.floor(Math.random() * 7) - 3;
         currentCount = Math.max(260, Math.min(315, currentCount + change));
         playerCount.textContent = currentCount;
       }
-
       setInterval(updatePlayerCount, 2000 + Math.random() * 3000);
 
-      // Detect TikTok / in-app browsers
-      function isInAppBrowser() {
-        var ua = navigator.userAgent || navigator.vendor || '';
-        return /TikTok|BytedanceWebview|Instagram|FBAN|FBAV|Line\//i.test(ua);
-      }
+      // Signup form
+      var signupForm = document.getElementById('signupForm');
+      var formMsg = document.getElementById('formMsg');
+      var submitBtn = document.getElementById('submitBtn');
 
-      var TARGET_URL = 'https://www.playtruco.com/auth/sign-up?type=tiktok';
-
-      function openExternal(e) {
+      signupForm.addEventListener('submit', function(e) {
         e.preventDefault();
-        var url = TARGET_URL;
 
-        if (!isInAppBrowser()) {
-          window.open(url, '_blank');
+        var username = document.getElementById('username').value.trim();
+        var email = document.getElementById('email').value.trim();
+        var password = document.getElementById('password').value;
+        var ageCheck = document.getElementById('ageCheck').checked;
+
+        if (!ageCheck) {
+          showMsg('Confirme que tem 18 anos ou mais.', 'error');
           return;
         }
 
-        var ua = navigator.userAgent || '';
-        var isIOS = /iPhone|iPad|iPod/i.test(ua);
-        var isAndroid = /Android/i.test(ua);
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Cadastrando...';
+        formMsg.className = 'form-msg';
+        formMsg.textContent = '';
 
-        if (isAndroid) {
-          // Android: intent to open in default browser
-          var intentUrl = 'intent://' + url.replace('https://', '') +
-            '#Intent;scheme=https;action=android.intent.action.VIEW;end';
-          window.location.href = intentUrl;
-          return;
-        }
+        fetch('https://user-v2.playtruco.com/auth/sign-up', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: email,
+            username: username,
+            password: password
+          })
+        })
+        .then(function(res) {
+          if (res.status === 201) {
+            showMsg('Conta criada com sucesso! Agora entre no app e faça login.', 'success');
+            signupForm.reset();
+          } else if (res.status === 409) {
+            showMsg('E-mail ou nick já cadastrado. Tente outro.', 'error');
+          } else {
+            showMsg('Erro ao criar conta. Tente novamente.', 'error');
+          }
+        })
+        .catch(function() {
+          showMsg('Erro de conexão. Tente novamente.', 'error');
+        })
+        .finally(function() {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Cadastre-se';
+        });
+      });
 
-        if (isIOS) {
-          // iOS: try multiple escape methods in sequence
-
-          // Method 1: Try googlechromes:// (opens Chrome on iOS)
-          var chromeUrl = url.replace('https://', 'googlechromes://');
-          window.location.href = chromeUrl;
-
-          // Method 2: After delay, try form submission with _blank target
-          setTimeout(function() {
-            var form = document.createElement('form');
-            form.action = url;
-            form.method = 'GET';
-            form.target = '_blank';
-            form.style.display = 'none';
-            document.body.appendChild(form);
-            form.submit();
-            document.body.removeChild(form);
-          }, 500);
-
-          // Method 3: After more delay, try window.open
-          setTimeout(function() {
-            window.open(url, '_blank');
-          }, 1000);
-
-          // Method 4: Last resort, try location change
-          setTimeout(function() {
-            window.location.href = url;
-          }, 1500);
-          return;
-        }
-
-        window.location.href = url;
+      function showMsg(text, type) {
+        formMsg.textContent = text;
+        formMsg.className = 'form-msg ' + type;
       }
     </script>
   </body>
