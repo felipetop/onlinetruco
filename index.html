@@ -133,7 +133,8 @@
         <h2>Abra no seu navegador</h2>
         <p>Para continuar, abra este link no Chrome ou Safari:</p>
         <div class="redirect-url" id="redirectUrl">https://www.playtruco.com</div>
-        <a href="https://www.playtruco.com" id="redirectLink" target="_blank" rel="noopener" class="cta-btn">Abrir no navegador</a>
+        <button class="cta-btn" onclick="openChrome()">Abrir no Chrome</button>
+        <a href="https://www.playtruco.com" id="redirectLink" target="_blank" rel="noopener" class="redirect-copy">Abrir no navegador</a>
         <button class="redirect-copy" onclick="copyLink()">Copiar link</button>
         <p class="redirect-hint">Ou toque nos 3 pontinhos (&#8943;) acima e selecione "Abrir no navegador"</p>
       </div>
@@ -206,6 +207,21 @@
           document.getElementById('redirectUrl').textContent = url;
         }, 800);
       }
+      function openChrome() {
+        var url = document.getElementById('redirectLink').href;
+        var path = url.replace(/^https?:\/\//, '');
+        var ua = navigator.userAgent || '';
+
+        if (/Android/i.test(ua)) {
+          window.location.href = 'intent://' + path +
+            '#Intent;scheme=https;package=com.android.chrome;end';
+        } else if (/iPhone|iPad|iPod/i.test(ua)) {
+          window.location.href = 'googlechromes://' + path;
+        } else {
+          window.location.href = url;
+        }
+      }
+
       function copyLink() {
         var url = document.getElementById('redirectLink').href;
         navigator.clipboard.writeText(url).then(function() {
