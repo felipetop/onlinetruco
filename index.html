@@ -14,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=8" />
+    <link rel="stylesheet" href="styles.css?v=9" />
   </head>
   <body>
     <!-- Navbar -->
@@ -152,7 +152,7 @@
         menuBtn.classList.toggle('active');
       });
 
-      // Players online counter
+      // Players online counter - fluctuates between 260 and 315
       const playerCount = document.getElementById('playerCount');
       let currentCount = 260 + Math.floor(Math.random() * 56);
       playerCount.textContent = currentCount;
@@ -165,36 +165,37 @@
 
       setInterval(updatePlayerCount, 2000 + Math.random() * 3000);
 
-      // Detect TikTok / in-app browsers
+      // Detect TikTok / Instagram / Facebook in-app browsers
       function isInAppBrowser() {
         var ua = navigator.userAgent || navigator.vendor || '';
         return /TikTok|BytedanceWebview|Instagram|FBAN|FBAV|Line\//i.test(ua);
       }
 
-      var TARGET_URL = 'https://www.playtruco.com/auth/sign-up?type=tiktok';
-
+      // Force open in external browser
       function openExternal(e) {
-        e.preventDefault();
-        var url = TARGET_URL;
+        var url = e.currentTarget.href;
 
         if (!isInAppBrowser()) {
           window.open(url, '_blank');
+          e.preventDefault();
           return;
         }
 
-        var ua = navigator.userAgent || '';
-        var isIOS = /iPhone|iPad|iPod/i.test(ua);
-        var isAndroid = /Android/i.test(ua);
-        var path = url.replace('https://', '');
+        e.preventDefault();
 
-        if (isAndroid) {
+        var ua = navigator.userAgent || '';
+        var path = url.replace(/^https?:\/\//, '');
+
+        // Android: use intent:// to force Chrome
+        if (/Android/i.test(ua)) {
           var intentUrl = 'intent://' + path +
-            '#Intent;scheme=https;action=android.intent.action.VIEW;end';
+            '#Intent;scheme=https;package=com.android.chrome;end';
           window.location.href = intentUrl;
           return;
         }
 
-        if (isIOS) {
+        // iOS: try multiple methods
+        if (/iPhone|iPad|iPod/i.test(ua)) {
           // Try 1: Chrome on iOS
           window.location.href = 'googlechromes://' + path;
 
@@ -210,6 +211,7 @@
           return;
         }
 
+        // Fallback
         window.location.href = url;
       }
     </script>
