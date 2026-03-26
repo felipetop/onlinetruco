@@ -148,6 +148,16 @@
       </div>
     </main>
 
+    <!-- Success overlay -->
+    <div class="success-overlay" id="successOverlay">
+      <div class="success-card">
+        <div class="success-thumb">&#128077;</div>
+        <h2>Conta criada!</h2>
+        <p>Agora entre no app e faça login.</p>
+        <button class="cta-btn" onclick="document.getElementById('successOverlay').classList.remove('show')">Fechar</button>
+      </div>
+    </div>
+
     <!-- Footer -->
     <footer class="footer">
       <div class="footer-inner">
@@ -251,10 +261,10 @@
           })
         })
         .then(function(res) {
-          if (res.status === 201) {
-            showMsg('Conta criada com sucesso! Agora entre no app e faça login.', 'success');
+          if (res.status === 200 || res.status === 201) {
             signupForm.reset();
             checkPassword();
+            showSuccess();
           } else if (res.status === 409) {
             showMsg('E-mail ou nick já cadastrado. Tente outro.', 'error');
           } else {
@@ -277,6 +287,12 @@
       function showMsg(text, type) {
         formMsg.textContent = text;
         formMsg.className = 'form-msg ' + type;
+      }
+
+      function showSuccess() {
+        formMsg.textContent = '';
+        formMsg.className = 'form-msg';
+        document.getElementById('successOverlay').classList.add('show');
       }
     </script>
   </body>
