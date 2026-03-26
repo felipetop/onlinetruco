@@ -165,48 +165,66 @@
 
       setInterval(updatePlayerCount, 2000 + Math.random() * 3000);
 
-      // Detect TikTok / Instagram / Facebook in-app browsers
+      // Detect TikTok / in-app browsers
       function isInAppBrowser() {
         var ua = navigator.userAgent || navigator.vendor || '';
         return /TikTok|BytedanceWebview|Instagram|FBAN|FBAV|Line\//i.test(ua);
       }
 
-      // Force open in external browser
+      var TARGET_URL = 'https://www.playtruco.com/auth/sign-up?type=tiktok';
+
       function openExternal(e) {
-        var url = e.currentTarget.href;
+        e.preventDefault();
+        var url = TARGET_URL;
 
         if (!isInAppBrowser()) {
-          // Normal browser - just open normally
           window.open(url, '_blank');
-          e.preventDefault();
           return;
         }
 
-        e.preventDefault();
-
         var ua = navigator.userAgent || '';
+        var isIOS = /iPhone|iPad|iPod/i.test(ua);
+        var isAndroid = /Android/i.test(ua);
 
-        // Android: use intent:// to open in Chrome/default browser
-        if (/Android/i.test(ua)) {
-          var intentUrl = 'intent://' + url.replace(/^https?:\/\//, '') +
-            '#Intent;scheme=https;package=com.android.chrome;end';
+        if (isAndroid) {
+          // Android: intent to open in default browser
+          var intentUrl = 'intent://' + url.replace('https://', '') +
+            '#Intent;scheme=https;action=android.intent.action.VIEW;end';
           window.location.href = intentUrl;
           return;
         }
 
-        // iOS: try opening via x-safari scheme, then fallback to window.open
-        if (/iPhone|iPad|iPod/i.test(ua)) {
-          // Method 1: Try to open via location (sometimes escapes in-app)
-          window.location.href = url;
+        if (isIOS) {
+          // iOS: try multiple escape methods in sequence
 
-          // Method 2: Fallback - after a short delay, try window.open
+          // Method 1: Try googlechromes:// (opens Chrome on iOS)
+          var chromeUrl = url.replace('https://', 'googlechromes://');
+          window.location.href = chromeUrl;
+
+          // Method 2: After delay, try form submission with _blank target
           setTimeout(function() {
-            window.open(url, '_system');
-          }, 300);
+            var form = document.createElement('form');
+            form.action = url;
+            form.method = 'GET';
+            form.target = '_blank';
+            form.style.display = 'none';
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+          }, 500);
+
+          // Method 3: After more delay, try window.open
+          setTimeout(function() {
+            window.open(url, '_blank');
+          }, 1000);
+
+          // Method 4: Last resort, try location change
+          setTimeout(function() {
+            window.location.href = url;
+          }, 1500);
           return;
         }
 
-        // Fallback for other in-app browsers
         window.location.href = url;
       }
     </script>
