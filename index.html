@@ -14,7 +14,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="styles.css?v=5" />
+    <link rel="stylesheet" href="styles.css?v=6" />
   </head>
   <body>
     <!-- Navbar -->
@@ -113,7 +113,7 @@
           </div>
           <div class="form-group">
             <input type="password" id="password" placeholder="Senha" required minlength="8" autocomplete="new-password" />
-            <ul class="pw-rules" id="pwRules">
+            <ul class="pw-rules hidden" id="pwRules">
               <li id="ruleLen"><span class="rule-icon">&#10005;</span> Mínimo 8 caracteres</li>
               <li id="ruleUpper"><span class="rule-icon">&#10005;</span> Pelo menos uma letra maiúscula</li>
               <li id="ruleLower"><span class="rule-icon">&#10005;</span> Pelo menos uma letra minúscula</li>
@@ -221,6 +221,9 @@
         return allValid;
       }
 
+      pwInput.addEventListener('focus', function() {
+        document.getElementById('pwRules').classList.remove('hidden');
+      });
       pwInput.addEventListener('input', checkPassword);
 
       // Signup form

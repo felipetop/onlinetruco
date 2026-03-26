@@ -345,9 +345,13 @@ a {
   padding: 0;
 }
 
+.pw-rules.hidden {
+  display: none;
+}
+
 .pw-rules li {
   font-size: 0.78rem;
-  color: #f87171;
+  color: var(--muted);
   display: flex;
   align-items: center;
   gap: 6px;
