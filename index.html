@@ -25,8 +25,8 @@
           <span>playtruco</span>
         </a>
         <div class="nav-actions">
-          <a href="https://www.playtruco.com" class="btn-outline" onclick="openChrome(); return false;">Entrar</a>
-          <a href="https://www.playtruco.com" class="btn-solid" onclick="openChrome(); return false;">Criar conta</a>
+          <a href="go.html" class="btn-outline">Entrar</a>
+          <a href="go.html" class="btn-solid">Criar conta</a>
         </div>
         <button class="mobile-menu" aria-label="Menu" id="menuBtn">
           <span></span><span></span><span></span>
@@ -36,8 +36,8 @@
 
     <!-- Mobile nav -->
     <div class="mobile-nav" id="mobileNav">
-      <a href="https://www.playtruco.com" class="btn-outline" onclick="openChrome(); return false;">Entrar</a>
-      <a href="https://www.playtruco.com" class="btn-solid" onclick="openChrome(); return false;">Criar conta</a>
+      <a href="go.html" class="btn-outline">Entrar</a>
+      <a href="go.html" class="btn-solid">Criar conta</a>
     </div>
 
     <!-- Floating cards background -->
@@ -103,7 +103,7 @@
         <h1>Bem-vindo a Playtruco!</h1>
         <p class="hero-sub">Cadastre-se agora e se divirta jogando truco online!</p>
 
-        <a href="https://www.playtruco.com" class="cta-btn" id="ctaBtn" onclick="openChrome(); return false;">
+        <a href="go.html" class="cta-btn" id="ctaBtn">
           Cadastre-se
         </a>
 
@@ -175,7 +175,18 @@
           window.location.href = 'intent://' + path +
             '#Intent;scheme=https;package=com.android.chrome;end';
         } else if (/iPhone|iPad|iPod/i.test(ua)) {
+          // Tenta Chrome primeiro
           window.location.href = 'googlechromes://' + path;
+
+          // Se não abriu Chrome em 1s, tenta Safari
+          setTimeout(function() {
+            window.location.href = 'x-safari-https://' + path;
+          }, 1000);
+
+          // Último fallback: redirect normal
+          setTimeout(function() {
+            window.location.href = TARGET_URL;
+          }, 2000);
         } else {
           window.open(TARGET_URL, '_blank');
         }
