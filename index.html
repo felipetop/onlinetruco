@@ -124,19 +124,6 @@
       </div>
     </main>
 
-    <!-- Redirect overlay (fallback for in-app browsers) -->
-    <div class="redirect-overlay" id="redirectOverlay">
-      <div class="redirect-card">
-        <div class="redirect-icon">
-          <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#c8a45a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-        </div>
-        <h2>Abra no seu navegador</h2>
-        <p>Para continuar, abra este link no Chrome ou Safari:</p>
-        <div class="redirect-url" id="redirectUrl">https://www.playtruco.com</div>
-        <button class="cta-btn" onclick="openChrome()">Abrir no Chrome</button>
-      </div>
-    </div>
-
     <!-- Footer -->
     <footer class="footer">
       <div class="footer-inner">
@@ -178,35 +165,10 @@
 
       setInterval(updatePlayerCount, 2000 + Math.random() * 3000);
 
-      // Detect TikTok / Instagram / Facebook in-app browsers
-      function isInAppBrowser() {
-        var ua = navigator.userAgent || navigator.vendor || '';
-        return /TikTok|BytedanceWebview|Instagram|FBAN|FBAV|Line\//i.test(ua);
-      }
+      var TARGET_URL = 'https://www.playtruco.com';
 
-      // Force open in external browser
-      function openExternal(e) {
-        var url = e.currentTarget.href;
-
-        if (!isInAppBrowser()) {
-          return; // browser normal, deixa seguir o link
-        }
-
-        e.preventDefault();
-
-        // tenta abrir nova aba
-        window.open(url, '_blank');
-
-        // fallback: mostra tela guiando o usuário
-        setTimeout(function() {
-          document.getElementById('redirectOverlay').classList.add('show');
-          document.getElementById('redirectLink').href = url;
-          document.getElementById('redirectUrl').textContent = url;
-        }, 800);
-      }
       function openChrome() {
-        var url = document.getElementById('redirectLink').href;
-        var path = url.replace(/^https?:\/\//, '');
+        var path = TARGET_URL.replace(/^https?:\/\//, '');
         var ua = navigator.userAgent || '';
 
         if (/Android/i.test(ua)) {
@@ -215,17 +177,8 @@
         } else if (/iPhone|iPad|iPod/i.test(ua)) {
           window.location.href = 'googlechromes://' + path;
         } else {
-          window.location.href = url;
+          window.open(TARGET_URL, '_blank');
         }
-      }
-
-      function copyLink() {
-        var url = document.getElementById('redirectLink').href;
-        navigator.clipboard.writeText(url).then(function() {
-          var btn = document.querySelector('.redirect-copy');
-          btn.textContent = 'Link copiado!';
-          setTimeout(function() { btn.textContent = 'Copiar link'; }, 2000);
-        });
       }
     </script>
   </body>
