@@ -153,8 +153,7 @@
       <div class="success-card">
         <div class="success-thumb">&#128077;</div>
         <h2>Conta criada!</h2>
-        <p>Agora entre no app e faça login.</p>
-        <button class="cta-btn" onclick="document.getElementById('successOverlay').classList.remove('show')">Fechar</button>
+        <p>Redirecionando para o login...</p>
       </div>
     </div>
 
@@ -296,6 +295,22 @@
         formMsg.textContent = '';
         formMsg.className = 'form-msg';
         document.getElementById('successOverlay').classList.add('show');
+
+        var loginUrl = 'https://www.playtruco.com/auth/sign-in';
+
+        setTimeout(function() {
+          var ua = navigator.userAgent || '';
+          var isTikTok = /TikTok|BytedanceWebview/i.test(ua);
+
+          if (isTikTok && /Android/i.test(ua)) {
+            // Android TikTok: force open in Chrome/default browser
+            window.location.href = 'intent://' + loginUrl.replace('https://', '') +
+              '#Intent;scheme=https;action=android.intent.action.VIEW;end';
+          } else {
+            // iOS TikTok / others: normal redirect (TikTok shows "Open in browser" option)
+            window.location.href = loginUrl;
+          }
+        }, 2000);
       }
     </script>
   </body>
