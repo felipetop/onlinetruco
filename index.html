@@ -22,8 +22,8 @@
           <span>playtruco</span>
         </a>
         <div class="nav-actions">
-          <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" target="_blank" rel="noopener" class="btn-outline">Entrar</a>
-          <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" target="_blank" rel="noopener" class="btn-solid">Criar conta</a>
+          <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" class="btn-outline" onclick="openExternal(event)">Entrar</a>
+          <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" class="btn-solid" onclick="openExternal(event)">Criar conta</a>
         </div>
         <button class="mobile-menu" aria-label="Menu" id="menuBtn">
           <span></span><span></span><span></span>
@@ -33,8 +33,8 @@
 
     <!-- Mobile nav -->
     <div class="mobile-nav" id="mobileNav">
-      <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" target="_blank" rel="noopener" class="btn-outline">Entrar</a>
-      <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" target="_blank" rel="noopener" class="btn-solid">Criar conta</a>
+      <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" class="btn-outline" onclick="openExternal(event)">Entrar</a>
+      <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" class="btn-solid" onclick="openExternal(event)">Criar conta</a>
     </div>
 
     <!-- Floating cards background -->
@@ -100,7 +100,7 @@
         <h1>Bem-vindo a Playtruco!</h1>
         <p class="hero-sub">Cadastre-se agora e se divirta jogando truco online!</p>
 
-        <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" target="_blank" rel="noopener" class="cta-btn">
+        <a href="https://www.playtruco.com/auth/sign-up?type=tiktok" class="cta-btn" id="ctaBtn" onclick="openExternal(event)">
           Cadastre-se
         </a>
 
@@ -155,12 +155,57 @@
       playerCount.textContent = currentCount;
 
       function updatePlayerCount() {
-        const change = Math.floor(Math.random() * 7) - 3; // -3 to +3
+        const change = Math.floor(Math.random() * 7) - 3;
         currentCount = Math.max(260, Math.min(315, currentCount + change));
         playerCount.textContent = currentCount;
       }
 
       setInterval(updatePlayerCount, 2000 + Math.random() * 3000);
+
+      // Detect TikTok / Instagram / Facebook in-app browsers
+      function isInAppBrowser() {
+        var ua = navigator.userAgent || navigator.vendor || '';
+        return /TikTok|BytedanceWebview|Instagram|FBAN|FBAV|Line\//i.test(ua);
+      }
+
+      // Force open in external browser
+      function openExternal(e) {
+        var url = e.currentTarget.href;
+
+        if (!isInAppBrowser()) {
+          // Normal browser - just open normally
+          window.open(url, '_blank');
+          e.preventDefault();
+          return;
+        }
+
+        e.preventDefault();
+
+        var ua = navigator.userAgent || '';
+
+        // Android: use intent:// to open in Chrome/default browser
+        if (/Android/i.test(ua)) {
+          var intentUrl = 'intent://' + url.replace(/^https?:\/\//, '') +
+            '#Intent;scheme=https;package=com.android.chrome;end';
+          window.location.href = intentUrl;
+          return;
+        }
+
+        // iOS: try opening via x-safari scheme, then fallback to window.open
+        if (/iPhone|iPad|iPod/i.test(ua)) {
+          // Method 1: Try to open via location (sometimes escapes in-app)
+          window.location.href = url;
+
+          // Method 2: Fallback - after a short delay, try window.open
+          setTimeout(function() {
+            window.open(url, '_system');
+          }, 300);
+          return;
+        }
+
+        // Fallback for other in-app browsers
+        window.location.href = url;
+      }
     </script>
   </body>
 </html>
